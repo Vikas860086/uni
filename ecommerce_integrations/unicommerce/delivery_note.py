@@ -68,7 +68,7 @@ def prepare_delivery_note():
 				if frappe.get_value("Sales Order", {ORDER_CODE_FIELD: order["saleOrderCode"]}):
 					sales_order = frappe.get_doc("Sales Order", {ORDER_CODE_FIELD: order["saleOrderCode"]})
 					if sales_order:
-						if not frappe.db.get_value("Delivery Note", {"shipment_id": order["code"]}, "name"):
+						if not frappe.db.get_value("Delivery Note", {"unicommerce_shipment_id": order["code"]}, "name"):
 							create_delivery_note(order, settings, sales_order)
 	except Exception as e:
 		create_unicommerce_log(status="Error", exception=e, rollback=True)
@@ -117,8 +117,8 @@ def create_delivery_note(order, settings, so):
 					"dont_recompute_tax": item.dont_recompute_tax,
 				},
 			)
-		res.unicommerce_order_no = order["saleOrderCode"]
-		res.shipment_id = order["code"]
+		res.unicommerce_order_code = order["saleOrderCode"]
+		res.unicommerce_shipment_id = order["code"]
 		res.save()
 		res.submit()
 		log = create_unicommerce_log(method="create_delevery_note", make_new=True)
